@@ -87,8 +87,8 @@ while flag == False:
         # Failed, click continue, start loop again
         driver.find_element(By.NAME, '5.1.27.27.11').click()
         print("Course could now be added, trying again in 30 sec :)")
-        time.sleep(30)
-        driver.implicitly_wait(30)
+        time.sleep(300)
+        driver.implicitly_wait(300)
 
     else:
         print("Successfully added the course")

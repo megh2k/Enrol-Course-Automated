@@ -5,12 +5,10 @@ from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import Select
 
-
 import time
 
 options = Options()
 options.add_experimental_option('detach', True)
-
 
 driver = webdriver.Chrome(service=Service(
     ChromeDriverManager().install()), options=options)
@@ -28,7 +26,6 @@ driver.find_element(By.NAME, 'dologin').click()
 time.sleep(5)
 driver.implicitly_wait(5)
 
-
 # Logged in successfully
 
 # Select Fall/Winter 24 from options, click Continue
@@ -39,12 +36,11 @@ driver.find_element(By.NAME, '5.5.1.27.1.13').click()
 time.sleep(2)
 driver.implicitly_wait(2)
 
-
 # Start Loop
 
 flag = False
 
-while flag == False:
+while flag is False:
     # click Add a Course
     driver.find_element(By.NAME, '5.1.27.1.23').click()
     time.sleep(2)
@@ -66,8 +62,7 @@ while flag == False:
     time.sleep(2)
     driver.implicitly_wait(2)
 
-
-    # 2 possibilities, either failed or succedded
+    # 2 possibilities, either failed or succeeded
 
     # check if failed
     results_text = driver.find_elements(By.CLASS_NAME, 'bodytext')
@@ -75,14 +70,13 @@ while flag == False:
 
     for x in results_text:
         if x.text == success:
-
             # Course added successfully, click continue and exit loop
             driver.find_element(By.NAME, '5.1.27.23.9').click()
             flag = True
             break
 
     # value did not change => course failed to be added
-    if flag == False:
+    if flag is False:
 
         # Failed, click continue, start loop again
         driver.find_element(By.NAME, '5.1.27.27.11').click()

@@ -77,39 +77,52 @@ def add_course():
                 return False
 
 
-print("Start Time =", datetime.now().strftime("%H:%M:%S"))
-available = False
-while available is False:
-    driver.get(vsb)
+try:
+    print("Start Time =", datetime.now().strftime("%H:%M:%S"))
+    available = False
+    while available is False:
+        driver.get(vsb)
 
-    WebDriverWait(driver, 60).until(
-        EC.presence_of_element_located((By.ID, 'term_2023102119'))
-    ).click()
-    driver.find_element(By.ID, 'code_number').send_keys(catalogue_number)
-    driver.find_element(By.ID, 'addCourseButton').click()
+        # if reloading page leads to sign up for York Account, autofill information and continue
+        try:
+            fall_winter_24 = WebDriverWait(driver, 60).until(
+                EC.presence_of_element_located((By.ID, 'term_2023102119'))
+            )
+            fall_winter_24.click()
+        except:
+            print('Login again required')
+            driver.find_element(By.ID, 'mli').send_keys(username)
+            driver.find_element(By.ID, 'password').send_keys(password)
+            driver.find_element(By.NAME, 'dologin').click()
+            fall_winter_24 = WebDriverWait(driver, 60).until(
+                EC.presence_of_element_located((By.ID, 'term_2023102119'))
+            )
+            fall_winter_24.click()
 
-    time.sleep(1)
-    WebDriverWait(driver, 10).until(
-        EC.presence_of_element_located((By.XPATH, '//span[text()="' + catalogue_number + '"]/../../span[text()]'))
-    )
+        driver.find_element(By.ID, 'code_number').send_keys(catalogue_number)
+        driver.find_element(By.ID, 'addCourseButton').click()
 
-    element = driver.find_element(By.XPATH,
-                                  '//span[text()="' + catalogue_number + '"]/../../span[text()]')
-
-    if element.text == "Seats: Available":
-        print('seats available!!! Trying to add the course.')
-        driver.get(rem)
         time.sleep(1)
-        available = add_course()
-        if available is False:
-            # Course could not be added because seats are reserved
-            print("Trying again in 15 minutes!")
-            print("Current Time =", datetime.now().strftime("%H:%M:%S"))
-            time.sleep(900)
+        WebDriverWait(driver, 10).until(
+            EC.presence_of_element_located((By.XPATH, '//span[text()="' + catalogue_number + '"]/../../span[text()]'))
+        )
 
-    else:
-        print('seats NOT available, trying again :)')
-        time.sleep(5)
+        element = driver.find_element(By.XPATH,
+                                      '//span[text()="' + catalogue_number + '"]/../../span[text()]')
 
-print("End Time =", datetime.now().strftime("%H:%M:%S"))
-driver.close()
+        if element.text == "Seats: Available":
+            print('seats available!!! Trying to add the course.')
+            driver.get(rem)
+            time.sleep(1)
+            available = add_course()
+            if available is False:
+                # Course could not be added because seats are reserved
+                print("Trying again in 15 minutes!")
+                print("Current Time =", datetime.now().strftime("%H:%M:%S"))
+                time.sleep(900)
+
+        else:
+            print('seats NOT available, trying again :)')
+finally:
+    print("End Time =", datetime.now().strftime("%H:%M:%S"))
+    driver.close()

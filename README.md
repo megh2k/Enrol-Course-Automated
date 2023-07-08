@@ -1,5 +1,6 @@
 # Enrol-Course-Automated
-python script to enrol in a specific course 
+python script to enrol in a specific course @ York University.
+The script constantly uses VSB information about available seats, if found, redirects to REM to enrol in the course.
 
 Follow the steps in order to successfully run the script.
 1. Have Python and Selenium installed.

@@ -6,8 +6,8 @@ from selenium.webdriver.support import expected_conditions as EC
 from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import Select
-import time
 from datetime import datetime
+import time
 
 options = Options()
 options.add_experimental_option('detach', True)
@@ -22,9 +22,9 @@ vsb = 'https://schedulebuilder.yorku.ca/vsb/criteria.jsp?access=0&lang=en&tip=1&
 driver.get(vsb)
 
 # Enter the following information
-username = ""
-password = ""
-catalogue_number = ""
+username = input("Username:")
+password = getpass.getpass()
+catalogue_number = input("Catalogue number:")
 
 driver.find_element(By.ID, 'mli').send_keys(username)
 driver.find_element(By.ID, 'password').send_keys(password)
@@ -89,8 +89,10 @@ try:
                 EC.presence_of_element_located((By.ID, 'term_2023102119'))
             )
             fall_winter_24.click()
+
         except:
             print('Login again required')
+            print("Current Time =", datetime.now().strftime("%H:%M:%S"))
             driver.find_element(By.ID, 'mli').send_keys(username)
             driver.find_element(By.ID, 'password').send_keys(password)
             driver.find_element(By.NAME, 'dologin').click()
@@ -121,8 +123,7 @@ try:
                 print("Current Time =", datetime.now().strftime("%H:%M:%S"))
                 time.sleep(900)
 
-        else:
-            print('seats NOT available, trying again :)')
+
 finally:
     print("End Time =", datetime.now().strftime("%H:%M:%S"))
     driver.close()

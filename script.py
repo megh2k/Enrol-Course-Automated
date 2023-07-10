@@ -86,7 +86,7 @@ try:
 
         # if reloading page leads to sign up for York Account, autofill information and continue
         try:
-            fall_winter_24 = WebDriverWait(driver, 60).until(
+            fall_winter_24 = WebDriverWait(driver, 120).until(
                 EC.presence_of_element_located((By.ID, 'term_2023102119'))
             )
             fall_winter_24.click()

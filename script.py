@@ -8,6 +8,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import Select
 from datetime import datetime
 import time
+import getpass
 
 options = Options()
 options.add_experimental_option('detach', True)

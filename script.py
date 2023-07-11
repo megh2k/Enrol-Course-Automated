@@ -25,7 +25,7 @@ driver.get(vsb)
 # Enter the following information
 username = input("Username:")
 password = getpass.getpass()
-catalogue_number = input("Catalogue number:")
+catalogue_number = "P84Y01"
 
 driver.find_element(By.ID, 'mli').send_keys(username)
 driver.find_element(By.ID, 'password').send_keys(password)

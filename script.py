@@ -24,7 +24,7 @@ password = getpass.getpass()
 # enter all course catalogue numbers in form of string, each seperated by a comma
 # eg: {'ABC', 'XYZ', '123'}
 
-catalogue_numbers = {}
+catalogue_numbers = {'P84Y01'}
 duplicate = copy.copy(catalogue_numbers)
 
 driver.find_element(By.ID, 'mli').send_keys(username)

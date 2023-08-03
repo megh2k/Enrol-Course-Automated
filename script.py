@@ -1,6 +1,5 @@
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
-from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from webdriver_manager.chrome import ChromeDriverManager
@@ -11,11 +10,8 @@ import time
 import getpass
 import copy
 
-options = Options()
-options.add_experimental_option('detach', True)
+driver = webdriver.Chrome(service=Service(ChromeDriverManager(version='114.0.5735.90').install()))
 
-driver = webdriver.Chrome(service=Service(
-    ChromeDriverManager().install()), options=options)
 
 rem = "https://wrem.sis.yorku.ca/Apps/WebObjects/REM.woa/wa/DirectAction/rem"
 vsb = 'https://schedulebuilder.yorku.ca/vsb/criteria.jsp?access=0&lang=en&tip=1&page=results&scratch=0&term=0&sort' \
@@ -28,7 +24,7 @@ password = getpass.getpass()
 # enter all course catalogue numbers in form of string, each seperated by a comma
 # eg: {'ABC', 'XYZ', '123'}
 
-catalogue_numbers = {}
+catalogue_numbers = {'P84Y01', 'R51Q01'}
 duplicate = copy.copy(catalogue_numbers)
 
 driver.find_element(By.ID, 'mli').send_keys(username)
@@ -119,8 +115,12 @@ try:
             element = driver.find_element(By.XPATH,
                                           '//span[text()="' + course + '"]/../../span[text()]')
 
-            title = driver.find_element(By.XPATH, '//h4[@class="course_title"]').text
-            print('\n'+title)
+            # WebDriverWait(driver, 10).until(
+            #     EC.presence_of_element_located(
+            #         (By.XPATH, '//h4[@class="course_title"]'))
+            # )
+            # title = driver.find_element(By.XPATH, '//h4[@class="course_title"]').text
+            # print('\n'+title)
             if element.text == "Seats: Available":
 
                 print('seats available!!!')
@@ -137,8 +137,8 @@ try:
                 # if course was added => remove from duplicate
                 else:
                     duplicate.remove(course)
-            else:
-                print('seats not available :(')
+            # else:
+                # print('seats not available :(')
 
         if duplicate:
             catalogue_numbers = copy.copy(duplicate)

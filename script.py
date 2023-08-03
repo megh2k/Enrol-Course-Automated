@@ -19,8 +19,8 @@ vsb = 'https://schedulebuilder.yorku.ca/vsb/criteria.jsp?access=0&lang=en&tip=1&
 
 driver.get(vsb)
 
-username = input("Username:")
-password = getpass.getpass()
+username = 'megh2k'
+password = 'Holmes@221b'
 # enter all course catalogue numbers in form of string, each seperated by a comma
 # eg: {'ABC', 'XYZ', '123'}
 

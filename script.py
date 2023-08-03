@@ -19,12 +19,13 @@ vsb = 'https://schedulebuilder.yorku.ca/vsb/criteria.jsp?access=0&lang=en&tip=1&
 
 driver.get(vsb)
 
-username = 'megh2k'
-password = 'Holmes@221b'
+username = input('username:')
+password = getpass.getpass()
+
 # enter all course catalogue numbers in form of string, each seperated by a comma
 # eg: {'ABC', 'XYZ', '123'}
+catalogue_numbers = {}
 
-catalogue_numbers = {'P84Y01'}
 duplicate = copy.copy(catalogue_numbers)
 
 driver.find_element(By.ID, 'mli').send_keys(username)

@@ -7,7 +7,6 @@ load_dotenv()
 
 
 def send_email(content):
-
     sg = SendGridAPIClient(os.getenv('API_KEY'))
     message = Mail(
         from_email=os.getenv('FROM_EMAIL'),
@@ -16,4 +15,3 @@ def send_email(content):
         html_content='Thanks <strong>pathhxh</strong> for creating this bot.')
 
     sg.send(message)
-

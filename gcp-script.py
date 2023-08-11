@@ -1,4 +1,3 @@
-import os
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.support.wait import WebDriverWait
@@ -10,11 +9,13 @@ from datetime import datetime
 import time
 import copy
 import emailSender
-from dotenv import load_dotenv
 
-load_dotenv()
+chrome_options = webdriver.ChromeOptions()
+chrome_options.add_argument("--headless")
+chrome_options.add_argument("--window-size=1920x1080")
+chrome_options.add_argument("--no-sandbox")
 
-driver = webdriver.Chrome(service=Service(ChromeDriverManager(version='114.0.5735.90').install()))
+driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=chrome_options)
 
 rem = "https://wrem.sis.yorku.ca/Apps/WebObjects/REM.woa/wa/DirectAction/rem"
 vsb = 'https://schedulebuilder.yorku.ca/vsb/criteria.jsp?access=0&lang=en&tip=1&page=results&scratch=0&term=0&sort' \
@@ -22,8 +23,8 @@ vsb = 'https://schedulebuilder.yorku.ca/vsb/criteria.jsp?access=0&lang=en&tip=1&
 
 driver.get(vsb)
 
-username = os.getenv('username')
-password = os.getenv('password')
+username = 'megh2k'
+password = 'Holmes@221b'
 
 # enter all course catalogue numbers in form of string, each seperated by a comma
 # eg: {'ABC', 'XYZ', '123'}
@@ -31,7 +32,6 @@ catalogue_numbers = {'P84Y01', 'R51Q01'}
 
 duplicate = copy.copy(catalogue_numbers)
 
-# 2FA login
 driver.find_element(By.ID, 'mli').send_keys(username)
 driver.find_element(By.ID, 'password').send_keys(password)
 driver.find_element(By.NAME, 'dologin').click()

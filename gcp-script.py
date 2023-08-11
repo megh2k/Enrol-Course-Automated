@@ -93,12 +93,14 @@ try:
     successful = False
     error = 0
     total_errors = 0
+    n = 0
 
     while successful is False:
         for course in catalogue_numbers:
 
             available = False
-            time.sleep(5)
+            print(n)
+            n += 1
             driver.get(vsb)
 
             try:

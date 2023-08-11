@@ -111,13 +111,14 @@ try:
                 code_number = WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.ID, 'code_number')))
                 code_number.send_keys(course)
 
-                add_course = WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.ID, 'addCourseButton')))
-                add_course.click()
+                add_course_button = WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.ID, 'addCourseButton')))
+                add_course_button.click()
 
                 box_element = WebDriverWait(driver, 10).until(
-                    EC.presence_of_element_located((By.CLASS_NAME, 'course_title')))
-                title = box_element.text
+                    EC.presence_of_element_located((By.XPATH, '//h4[@class="course_title"]')))
+                title = box_element.get_attribute("innerText")
                 element = driver.find_element(By.XPATH, '//span[text()="' + course + '"]/../../span[text()]')
+                time.sleep(1)
 
                 # if we reached till here => no errors found => set error to 0
                 error = 0
@@ -156,7 +157,7 @@ try:
 
             if element.text == "Seats: Available":
 
-                print('seats available!!! for ' + course)
+                print('seats available!!! for ' + title)
                 driver.get(rem)
                 time.sleep(1)
                 available = add_course(course)

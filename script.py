@@ -1,3 +1,4 @@
+import os
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.support.wait import WebDriverWait
@@ -7,11 +8,13 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import Select
 from datetime import datetime
 import time
-import getpass
 import copy
+import emailSender
+from dotenv import load_dotenv
+
+load_dotenv()
 
 driver = webdriver.Chrome(service=Service(ChromeDriverManager(version='114.0.5735.90').install()))
-
 
 rem = "https://wrem.sis.yorku.ca/Apps/WebObjects/REM.woa/wa/DirectAction/rem"
 vsb = 'https://schedulebuilder.yorku.ca/vsb/criteria.jsp?access=0&lang=en&tip=1&page=results&scratch=0&term=0&sort' \
@@ -19,21 +22,28 @@ vsb = 'https://schedulebuilder.yorku.ca/vsb/criteria.jsp?access=0&lang=en&tip=1&
 
 driver.get(vsb)
 
-username = 'megh2k'
-password = 'Holmes@221b'
+username = os.getenv('username')
+password = os.getenv('password')
+
 # enter all course catalogue numbers in form of string, each seperated by a comma
 # eg: {'ABC', 'XYZ', '123'}
-<<<<<<< HEAD
 catalogue_numbers = {'P84Y01', 'R51Q01'}
-=======
->>>>>>> parent of fcde21f (Update script.py)
 
-catalogue_numbers = {'P84Y01'}
 duplicate = copy.copy(catalogue_numbers)
 
+# 2FA login
 driver.find_element(By.ID, 'mli').send_keys(username)
 driver.find_element(By.ID, 'password').send_keys(password)
 driver.find_element(By.NAME, 'dologin').click()
+
+WebDriverWait(driver, 10).until(
+    EC.frame_to_be_available_and_switch_to_it((By.XPATH, "//iframe[@id='duo_iframe']"))
+)
+WebDriverWait(driver, 10).until(
+    EC.element_to_be_clickable((By.XPATH, '//input[@name="dampen_choice"]'))).click()
+WebDriverWait(driver, 10).until(
+    EC.element_to_be_clickable((By.XPATH, "//button[text()='Send Me a Push ']"))).click()
+time.sleep(10)
 
 
 def add_course(catalogue_number):
@@ -81,53 +91,72 @@ try:
     print("Start Time =", datetime.now().strftime("%H:%M:%S"))
     # All courses have not been added successfully yet
     successful = False
+    error = 0
+    total_errors = 0
 
     while successful is False:
         for course in catalogue_numbers:
 
             available = False
+            time.sleep(5)
             driver.get(vsb)
 
-            # if reloading page leads to sign up for York Account, autofill information and continue
             try:
-                fall_winter_24 = WebDriverWait(driver, 120).until(
+
+                fall_winter_24 = WebDriverWait(driver, 10).until(
                     EC.presence_of_element_located((By.ID, 'term_2023102119'))
                 )
                 fall_winter_24.click()
 
-            # York 2FA login required
+                code_number = WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.ID, 'code_number')))
+                code_number.send_keys(course)
+
+                add_course = WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.ID, 'addCourseButton')))
+                add_course.click()
+
+                box_element = WebDriverWait(driver, 10).until(
+                    EC.presence_of_element_located((By.CLASS_NAME, 'course_title')))
+                title = box_element.text
+                element = driver.find_element(By.XPATH, '//span[text()="' + course + '"]/../../span[text()]')
+
+                # if we reached till here => no errors found => set error to 0
+                error = 0
+
             except:
-                print('Login again required')
+                total_errors += 1
+                error += 1
+                print('error: ', error)
                 print("Current Time =", datetime.now().strftime("%H:%M:%S"))
-                driver.find_element(By.ID, 'mli').send_keys(username)
-                driver.find_element(By.ID, 'password').send_keys(password)
-                driver.find_element(By.NAME, 'dologin').click()
-                fall_winter_24 = WebDriverWait(driver, 60).until(
-                    EC.presence_of_element_located((By.ID, 'term_2023102119'))
-                )
-                fall_winter_24.click()
 
-            driver.find_element(By.ID, 'code_number').send_keys(course)
-            driver.find_element(By.ID, 'addCourseButton').click()
+                # if this is the first error, skip this round, maybe a page refresh will fix it
+                if error == 1:
+                    # do nothing
+                    print('error == 1')
 
-            time.sleep(1)
-            WebDriverWait(driver, 10).until(
-                EC.presence_of_element_located(
-                    (By.XPATH, '//span[text()="' + course + '"]/../../span[text()]'))
-            )
+                # if refresh didn't solve the issue => login again probably required
+                elif error == 2:
+                    try:
 
-            element = driver.find_element(By.XPATH,
-                                          '//span[text()="' + course + '"]/../../span[text()]')
+                        print('Login again required')
+                        driver.find_element(By.ID, 'mli').send_keys(username)
+                        driver.find_element(By.ID, 'password').send_keys(password)
+                        driver.find_element(By.NAME, 'dologin').click()
+                        time.sleep(10)
+                    except:
+                        # if login again wasn't required => site under maintenance
+                        print('except in error == 2')
 
-            # WebDriverWait(driver, 10).until(
-            #     EC.presence_of_element_located(
-            #         (By.XPATH, '//h4[@class="course_title"]'))
-            # )
-            # title = driver.find_element(By.XPATH, '//h4[@class="course_title"]').text
-            # print('\n'+title)
+                # website probably under maintenance, wait for 15 minutes
+                else:
+                    print('Site probably under maintenance')
+                    print('This happens usually between 12 AM - 1 AM')
+                    time.sleep(900)
+
+                continue  # skip this round, go to the next element in the loop for a page refresh
+
             if element.text == "Seats: Available":
 
-                print('seats available!!!')
+                print('seats available!!! for ' + course)
                 driver.get(rem)
                 time.sleep(1)
                 available = add_course(course)
@@ -140,9 +169,8 @@ try:
 
                 # if course was added => remove from duplicate
                 else:
+                    emailSender.send_email(title + ' has been added successfully')
                     duplicate.remove(course)
-            # else:
-                # print('seats not available :(')
 
         if duplicate:
             catalogue_numbers = copy.copy(duplicate)

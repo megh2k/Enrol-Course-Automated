@@ -2,4 +2,4 @@
 *.xml
 *.pyc
 .idea/.name
-./gcp-script.py
+./gcp-script.pygcp-script.py

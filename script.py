@@ -14,7 +14,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-driver = webdriver.Chrome(service=Service(ChromeDriverManager(version='114.0.5735.90').install()))
+driver = webdriver.Chrome()
 
 rem = "https://wrem.sis.yorku.ca/Apps/WebObjects/REM.woa/wa/DirectAction/rem"
 vsb = 'https://schedulebuilder.yorku.ca/vsb/criteria.jsp?access=0&lang=en&tip=1&page=results&scratch=0&term=0&sort' \
@@ -25,9 +25,9 @@ driver.get(vsb)
 username = os.getenv('username')
 password = os.getenv('password')
 
-# enter all course catalogue numbers in form of string, each seperated by a comma
+# enter all course catalogue numbers in form of string, each separated by a comma
 # eg: {'ABC', 'XYZ', '123'}
-catalogue_numbers = {'P84Y01', 'R51Q01'}
+catalogue_numbers = {}
 
 duplicate = copy.copy(catalogue_numbers)
 
@@ -36,20 +36,13 @@ driver.find_element(By.ID, 'mli').send_keys(username)
 driver.find_element(By.ID, 'password').send_keys(password)
 driver.find_element(By.NAME, 'dologin').click()
 
-WebDriverWait(driver, 10).until(
-    EC.frame_to_be_available_and_switch_to_it((By.XPATH, "//iframe[@id='duo_iframe']"))
-)
-WebDriverWait(driver, 10).until(
-    EC.element_to_be_clickable((By.XPATH, '//input[@name="dampen_choice"]'))).click()
-WebDriverWait(driver, 10).until(
-    EC.element_to_be_clickable((By.XPATH, "//button[text()='Send Me a Push ']"))).click()
-time.sleep(10)
+time.sleep(15)
 
 
 def add_course(catalogue_number):
     # Select Fall/Winter 24 from options, click Continue
     select = Select(driver.find_element(By.NAME, '5.5.1.27.1.11.0'))
-    select.select_by_value('3')
+    select.select_by_value('2')
     driver.find_element(By.XPATH, '//input[@value="Continue"]').click()
 
     # click Add a Course
@@ -104,7 +97,7 @@ try:
             try:
 
                 fall_winter_24 = WebDriverWait(driver, 10).until(
-                    EC.presence_of_element_located((By.ID, 'term_2023102119'))
+                    EC.presence_of_element_located((By.ID, 'term_2024102119'))
                 )
                 fall_winter_24.click()
 
@@ -183,4 +176,4 @@ try:
 
 finally:
     print("End Time =", datetime.now().strftime("%H:%M:%S"))
-    driver.close()
+    # driver.close()

@@ -1,17 +1,23 @@
-from sendgrid import SendGridAPIClient
-from sendgrid.helpers.mail import Mail
-import os
+
 from dotenv import load_dotenv
+import smtplib
+import os
+from email.message import EmailMessage
 
 load_dotenv()
 
 
-def send_email(content):
-    sg = SendGridAPIClient(os.getenv('API_KEY'))
-    message = Mail(
-        from_email=os.getenv('FROM_EMAIL'),
-        to_emails=os.getenv('TO_EMAIL'),
-        subject=content,
-        html_content='Thanks <strong>pathhxh</strong> for creating this bot.')
 
-    sg.send(message)
+def send_email(subject):
+    msg = EmailMessage()
+    msg.set_content('Thanks pathhxh for creating this bot.')
+
+    msg['Subject'] = subject
+    msg['From'] = "hirparamegh@gmail.com"
+    msg['To'] = os.getenv("TO_EMAIL")
+
+    s = smtplib.SMTP('smtp.gmail.com', 587)
+    s.starttls()
+    s.login("hirparamegh@gmail.com", "mbib xhyp gcng szze")
+    s.send_message(msg)
+    s.quit()

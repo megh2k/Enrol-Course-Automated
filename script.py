@@ -91,7 +91,7 @@ try:
         for course in catalogue_numbers:
 
             available = False
-            time.sleep(5)
+            time.sleep(int(os.getenv('WAIT_TIME')))
             driver.get(vsb)
 
             try:

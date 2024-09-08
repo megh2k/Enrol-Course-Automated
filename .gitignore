@@ -1,4 +1,3 @@
-.env
 *.xml
 *.pyc
 .idea/.name
